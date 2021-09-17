@@ -1,0 +1,98 @@
+
+.main {
+  background: url('./assets/images/background.jpg');
+  background-size: cover;
+  height: 100vh;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  50%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.overlay {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+}
+
+.stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.stars-1 {
+  animation: fadeIn 4s infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.stars-2 {
+  animation: fadeIn 4s infinite;
+  animation-timing-function: ease-in-out;
+  animation-delay: 3s;
+}
+
+.foreground {
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-around;
+  z-index: 1;
+}
+
+.logo {
+  width: 5rem;
+  height: 5rem;
+}
+
+.account {
+  border: 2px solid white;
+  border-radius: 1.5rem;
+  font-weight: bold;
+}
+
+.buy-button {
+  width: 200px;
+  border-radius: 30px;
+  font-weight: bold;
+}
+
+.buy-1 {
+  background-color: #FFFBEF;
+}
+
+.buy-10 {
+  background: #ffc633;
+  box-shadow: 0px 0px .5rem .25rem rgba(255,255,255, .6) inset;
+}
+
+footer {
+  color: #BFB8A7;
+  font-size: 1.25rem;
+}
+
+img.preview {
+  border-radius: .5rem;
+  max-width: 300px;
+  height: auto;
+}
+
+.preview-token {
+  max-width: 300px;
+  height: auto;
+}
+
+.plain-link {
+  color: inherit;
+  text-decoration: none;
+  transition: all .2s;
+}
+
+.plain-link:hover {
+  color: unset;
+  opacity: .8;
+}
