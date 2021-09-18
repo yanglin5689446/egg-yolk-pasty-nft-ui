@@ -11,7 +11,7 @@ import packingSingleGIF from './assets/images/packing-single.gif'
 
 
 const CONTRACT_ADDRESS = "0x1f8bd381d0df1c6244cf36020775b89a121ae911"
-// const CONTRACT_ADDRESS = "0xafd4e6ce929e1358b65bdb217f818c2052f237a5"
+// const CONTRACT_ADDRESS = "0x0b48e0358277343091a7c0329840c5eb8981d17e"
 const CONTRACT_ABI = [{"inputs":[{"internalType":"string","name":"_baseURI","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"account","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256[]","name":"ids","type":"uint256[]"},{"indexed":false,"internalType":"uint256[]","name":"values","type":"uint256[]"}],"name":"TransferBatch","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"TransferSingle","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"string","name":"value","type":"string"},{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"}],"name":"URI","type":"event"},{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address[]","name":"accounts","type":"address[]"},{"internalType":"uint256[]","name":"ids","type":"uint256[]"}],"name":"balanceOfBatch","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"number","type":"uint256"}],"name":"mintMultiple","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"ownerClaim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"presaleMint","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"number","type":"uint256"}],"name":"presaleMintMultiple","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"presalePrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"price","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256[]","name":"ids","type":"uint256[]"},{"internalType":"uint256[]","name":"amounts","type":"uint256[]"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeBatchTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"uri","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}]
 const CHAIN_ID = 137
 // const CHAIN_ID = 4
@@ -50,6 +50,13 @@ const App = () => {
     if(chainId !== CHAIN_ID) {
       setConnectionError(CONNECTION_ERRORS.WRONG_NETWORK)
     }
+    window.ethereum.on('chainChanged', (_chainId) => {
+      if(parseInt(_chainId, 16) !== CHAIN_ID) {
+        setConnectionError(CONNECTION_ERRORS.WRONG_NETWORK)
+      } else {
+        setConnectionError(null)
+      }
+    });
   }, [account])
 
   useEffect(() => {
@@ -71,7 +78,6 @@ const App = () => {
 
       const newlyMinted = result.events.TransferSingle.returnValues.id
       const tokenURI = await contract.methods.uri(+newlyMinted).call()
-      console.log(tokenURI)
       const image = await fetch(tokenURI)
         .then(response => response.json())
         .then(json => json.image)
@@ -144,8 +150,13 @@ const App = () => {
               { loadingStatus === LOADING_STATUS.MINTING_DONE 
                 ? <>
                     <div className="row g-2">
-                      {minted.map((token, index) => (
+                      {minted && minted.length === 1 && minted.map((token, index) => (
                         <div key={index} className="col">
+                          <img src={token} className="preview-token img-fluid" alt="" />
+                        </div>
+                      ))}
+                      {minted && minted.length === 11 && minted.map((token, index) => (
+                        <div key={index} className="col-3">
                           <img src={token} className="preview-token img-fluid" alt="" />
                         </div>
                       ))}
@@ -180,7 +191,7 @@ const App = () => {
                         className="btn buy-button buy-1 my-2 mx-3 d-block d-md-inline-block" 
                         type="button"
                         onClick={mint}
-                        disabled={loadingStatus === LOADING_STATUS.MINTING_1}
+                        disabled={loadingStatus === LOADING_STATUS.MINTING_1 || !!connectionError}
                       >
                         { loadingStatus === LOADING_STATUS.MINTING_1 ? <i className="fas fa-circle-notch fa-spin" /> : "買 1 個月餅！" }
                       </button>
@@ -188,7 +199,7 @@ const App = () => {
                         className="btn buy-button buy-10 my-2 mx-3 d-block d-md-inline-block"
                         type="button"
                         onClick={mint10}
-                        disabled={loadingStatus === LOADING_STATUS.MINTING_10}
+                        disabled={loadingStatus === LOADING_STATUS.MINTING_10 || !!connectionError}
                       >
                         {loadingStatus === LOADING_STATUS.MINTING_10 ? <i className="fas fa-circle-notch fa-spin" /> : "我要買 10 個！"}
                         
