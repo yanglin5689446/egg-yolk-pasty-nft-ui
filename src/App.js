@@ -71,9 +71,9 @@ const App = () => {
   const mint = useCallback(async () => {
     setLoadingStatus(LOADING_STATUS.MINTING_1);
     try {
-      const result = await contract.methods.presaleMint().send({
+      const result = await contract.methods.mint().send({
         from: account,
-        value: 1190000000000000000,
+        value: 1490000000000000000,
       })
 
       const newlyMinted = result.events.TransferSingle.returnValues.id
@@ -92,9 +92,9 @@ const App = () => {
   const mint10 = useCallback(async () => {
     setLoadingStatus(LOADING_STATUS.MINTING_10);
     try {
-      const result = await contract.methods.presaleMintMultiple(10).send({
+      const result = await contract.methods.mintMultiple(10).send({
         from: account,
-        value: 11900000000000000000,
+        value: 14900000000000000000,
       })
       const newlyMinted = result.events.TransferSingle.map(item => +item.returnValues.id)
       const tokenURIs = await Promise.all(newlyMinted.map(id => contract.methods.uri(id).call()))
@@ -149,7 +149,7 @@ const App = () => {
             <div className="offset-1 col-10 offset-md-5 col-md-7 d-flex flex-column align-items-center">
               { loadingStatus === LOADING_STATUS.MINTING_DONE 
                 ? <>
-                    <div className="row g-2">
+                    <div className="row g-2 justify-content-center">
                       {minted && minted.length === 1 && minted.map((token, index) => (
                         <div key={index} className="col">
                           <img src={token} className="preview-token img-fluid" alt="" />
@@ -157,7 +157,7 @@ const App = () => {
                       ))}
                       {minted && minted.length === 11 && minted.map((token, index) => (
                         <div key={index} className="col-3">
-                          <img src={token} className="preview-token img-fluid" alt="" />
+                          <img src={token} className="img-fluid" alt="" />
                         </div>
                       ))}
                     </div>
