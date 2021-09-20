@@ -83,11 +83,10 @@ const App = () => {
         .then(json => json.image)
       setMinted([image]);
       setLoadingStatus(LOADING_STATUS.MINTING_DONE);
-      setTimeout(() => confirmAndReload(), 15000)
     } catch(e) {
       setLoadingStatus(LOADING_STATUS.IDLE);
     }
-  }, [account, confirmAndReload])
+  }, [account])
 
   const mint10 = useCallback(async () => {
     setLoadingStatus(LOADING_STATUS.MINTING_10);
@@ -106,11 +105,10 @@ const App = () => {
         ))
       setMinted(images);
       setLoadingStatus(LOADING_STATUS.MINTING_DONE);
-      setTimeout(() => confirmAndReload(), 30000)
     } catch(e) {
       setLoadingStatus(LOADING_STATUS.IDLE);
     }
-  }, [account, confirmAndReload])
+  }, [account])
 
   
 
@@ -161,14 +159,24 @@ const App = () => {
                         </div>
                       ))}
                     </div>
-                    <button
-                      className="btn buy-button buy-1 mt-5 mx-3" 
-                      type="button"
-                      onClick={confirmAndReload}
-                      disabled={loadingStatus === LOADING_STATUS.MINTING_1}
-                    >
-                      確認
-                    </button>
+                    <div className="d-flex justify-content-center flex-column flex-md-row mt-5">
+                      <button
+                        className="btn buy-button buy-1 mt-5 mx-3" 
+                        type="button"
+                        onClick={confirmAndReload}
+                      >
+                        確認
+                      </button>
+                      <a
+                        className="btn buy-button buy-10 mt-5 mx-3" 
+                        type="button"
+                        href="https://opensea.io/account"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        前往 OpenSea 觀看
+                      </a>
+                    </div>
                   </>
                 : (
                   <>
@@ -193,7 +201,15 @@ const App = () => {
                         onClick={mint}
                         disabled={loadingStatus === LOADING_STATUS.MINTING_1 || !!connectionError}
                       >
-                        { loadingStatus === LOADING_STATUS.MINTING_1 ? <i className="fas fa-circle-notch fa-spin" /> : "買 1 個月餅！" }
+                        { loadingStatus === LOADING_STATUS.MINTING_1 
+                          ? (
+                              <span>
+                                <i className="fas fa-circle-notch fa-spin me-2" />
+                                <span>烘焙中...</span>
+                              </span>
+                            ) 
+                          : "買 1 個蛋黃酥！" 
+                        }
                       </button>
                       <button
                         className="btn buy-button buy-10 my-2 mx-3 d-block d-md-inline-block"
@@ -201,7 +217,15 @@ const App = () => {
                         onClick={mint10}
                         disabled={loadingStatus === LOADING_STATUS.MINTING_10 || !!connectionError}
                       >
-                        {loadingStatus === LOADING_STATUS.MINTING_10 ? <i className="fas fa-circle-notch fa-spin" /> : "我要買 10 個！"}
+                        {loadingStatus === LOADING_STATUS.MINTING_10 
+                          ? (
+                            <span>
+                              <i className="fas fa-circle-notch fa-spin me-2" />
+                              <span>烘焙中...</span>
+                            </span>
+                          ) 
+                          : "我要買 10 個！"
+                        }
                         
                       </button>
                     </div>
